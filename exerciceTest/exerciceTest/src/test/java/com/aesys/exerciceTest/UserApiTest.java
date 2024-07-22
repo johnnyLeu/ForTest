@@ -1,5 +1,9 @@
 package com.aesys.exerciceTest;
 
+import com.aesys.exerciceTest.model.Address;
+import com.aesys.exerciceTest.model.Company;
+import com.aesys.exerciceTest.model.Geo;
+import com.aesys.exerciceTest.model.User;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeAll;
@@ -62,28 +66,7 @@ public class UserApiTest {
 		String userId = getResponse.jsonPath().getString("id[0]");
 
 		// Crea un nuovo utente basato sul primo utente
-		String newUser = "{\n" +
-				"  \"name\": \"New User\",\n" +
-				"  \"username\": \"newuser\",\n" +
-				"  \"email\": \"newuser@example.com\",\n" +
-				"  \"address\": {\n" +
-				"    \"street\": \"123 New Street\",\n" +
-				"    \"suite\": \"Suite 123\",\n" +
-				"    \"city\": \"New City\",\n" +
-				"    \"zipcode\": \"12345\",\n" +
-				"    \"geo\": {\n" +
-				"      \"lat\": \"-70.0000\",\n" +
-				"      \"lng\": \"-50.0000\"\n" +
-				"    }\n" +
-				"  },\n" +
-				"  \"phone\": \"1-234-567-8900\",\n" +
-				"  \"website\": \"newuser.info\",\n" +
-				"  \"company\": {\n" +
-				"    \"name\": \"New Company\",\n" +
-				"    \"catchPhrase\": \"New Company Catchphrase\",\n" +
-				"    \"bs\": \"New Company Business\"\n" +
-				"  }\n" +
-				"}";
+		User newUser = getNewUser();
 
 		// Invia una richiesta POST per creare un nuovo utente
 		Response postResponse = given()
@@ -93,11 +76,41 @@ public class UserApiTest {
 				.post("/users")
 				.then()
 				.statusCode(201)
+				.body("id", notNullValue())
 				.extract().response();
 
 		// Verifica che l'ID del nuovo utente sia presente nella risposta
-		String newUserId = postResponse.jsonPath().getString("id");
-		System.out.println("Created User ID: " + newUserId);
+		User newUserId = postResponse.as(User.class);
+		System.out.println("Created User ID: " + newUserId.getId());
+	}
+
+	private static User getNewUser() {
+		User newUser = new User();
+		newUser.setName("New User");
+		newUser.setUsername("newuser");
+		newUser.setEmail("newuser@example.com");
+
+		Address address = new Address();
+		address.setStreet("123 New Street");
+		address.setSuite("Suite 123");
+		address.setCity("New City");
+		address.setZipcode("12345");
+
+		Geo geo = new Geo();
+		geo.setLat("-70.0000");
+		geo.setLng("-50.0000");
+		address.setGeo(geo);
+
+		newUser.setAddress(address);
+		newUser.setPhone("1-234-567-8900");
+		newUser.setWebsite("newuser.info");
+
+		Company company = new Company();
+		company.setName("New Company");
+		company.setCatchPhrase("New Company Catchphrase");
+		company.setBs("New Company Business");
+		newUser.setCompany(company);
+		return newUser;
 	}
 }
 
