@@ -1,5 +1,8 @@
 package com.aesys.exerciceTest;
 
+import com.aesys.exerciceTest.model.User;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeAll;
@@ -7,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class UserApiTest {
 
@@ -98,6 +103,40 @@ public class UserApiTest {
 		// Verifica che l'ID del nuovo utente sia presente nella risposta
 		String newUserId = postResponse.jsonPath().getString("id");
 		System.out.println("Created User ID: " + newUserId);
+	}
+
+	@Test
+	public void testSerialization() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper();
+		String jsonString = """
+                {
+                    "name": "Florinda",
+                    "email": "Florinda@mail.com",
+                    "details": {
+                        "displayAspectRatio": "97:3",
+                        "audioConnector": "none"
+                    }
+                }
+                """;
+
+		// Deserializzazione
+		User user = objectMapper.readValue(jsonString, User.class);
+
+		// Verifica delle proprietà deserializzate
+		assertEquals("Florinda", user.getName());
+		assertEquals("Florinda@mail.com", user.getEmail());
+
+		// Verifica del nodo JSON dinamico
+		JsonNode details = user.getDetails();
+		assertNotNull(details);
+		assertEquals("97:3", details.get("displayAspectRatio").asText());
+		assertEquals("none", details.get("audioConnector").asText());
+
+		// Serializzazione
+		String serializedJson = objectMapper.writeValueAsString(user);
+		System.out.println("Serialized JSON: " + serializedJson);
+
+
 	}
 }
 

@@ -1,5 +1,7 @@
 package com.aesys.exerciceTest.model;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public class User {
     private float id;
     private String name;
@@ -9,9 +11,17 @@ public class User {
     private String phone;
     private String website;
     private Company CompanyObject;
+    private JsonNode details;
 
+    public JsonNode getDetails() {
+        return details;
+    }
 
-    // Getter Methods
+    public void setDetails(JsonNode details) {
+        this.details = details;
+    }
+
+// Getter Methods
 
     public float getId() {
         return id;
