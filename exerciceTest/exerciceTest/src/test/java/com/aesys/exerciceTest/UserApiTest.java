@@ -4,6 +4,7 @@ import com.aesys.exerciceTest.model.User;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
+
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -51,6 +52,7 @@ public class UserApiTest {
 				.extract().response();
 
 		System.out.println(getResponse.getBody().asString());
+		getResponse.as(User.class).getName();
 	}
 
 	@Test
