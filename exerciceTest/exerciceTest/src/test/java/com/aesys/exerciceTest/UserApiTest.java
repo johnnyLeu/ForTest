@@ -138,5 +138,54 @@ public class UserApiTest {
 
 
 	}
+
+	@Test
+	public void testSerialization1() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper();
+		String jsonString = """
+				{
+				             "id": 1,
+				             "name": "Leanne Graham",
+				             "username": "Bret",
+				             "email": "Sincere@april.biz",
+				             "address": {
+				                 "street": "Kulas Light",
+				                 "suite": "Apt. 556",
+				                 "city": "Gwenborough",
+				                 "zipcode": "92998-3874",
+				                 "geo": {
+				                     "lat": "-37.3159",
+				                     "lng": "81.1496"
+				                 }
+				             },
+				             "phone": "1-770-736-8031 x56442",
+				             "website": "hildegard.org",
+				             "company": {
+				                 "name": "Romaguera-Crona",
+				                 "catchPhrase": "Multi-layered client-server neural-net",
+				                 "bs": "harness real-time e-markets"
+				             }
+				         }
+                """;
+
+		// Deserializzazione
+		User user = objectMapper.readValue(jsonString, User.class);
+
+		// Verifica delle proprietà deserializzate
+		assertEquals("Leanne Graham", user.getName());
+		assertEquals("Sincere@april.biz", user.getEmail());
+
+//		// Verifica del nodo JSON dinamico
+//		JsonNode details = user.getDetails();
+//		assertNotNull(details);
+//		assertEquals("97:3", details.get("displayAspectRatio").asText());
+//		assertEquals("none", details.get("audioConnector").asText());
+
+		// Serializzazione
+		String serializedJson = objectMapper.writeValueAsString(user);
+		System.out.println("Serialized JSON: " + serializedJson);
+
+
+	}
 }
 
