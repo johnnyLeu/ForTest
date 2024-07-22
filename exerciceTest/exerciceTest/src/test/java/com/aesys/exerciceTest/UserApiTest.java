@@ -173,7 +173,10 @@ public class UserApiTest {
 
 		// Verifica delle proprietà deserializzate
 		assertEquals("Leanne Graham", user.getName());
+		assertEquals("Bret", user.getUsername());
 		assertEquals("Sincere@april.biz", user.getEmail());
+		assertEquals("Gwenborough", user.getAddress().getCity());
+		assertEquals("hildegard.org", user.getWebsite());
 
 //		// Verifica del nodo JSON dinamico
 //		JsonNode details = user.getDetails();
