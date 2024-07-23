@@ -6,18 +6,16 @@ import com.aesys.exerciceTest.model.Geo;
 import com.aesys.exerciceTest.model.User;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
+import static com.aesys.exerciceTest.utilities.UserApiTestUtil.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UserApiTest {
 
@@ -37,23 +35,21 @@ public class UserApiTest {
 				.when()
 				.get("/users/{id}") // URL parametrizzato
 				.then()
-				.statusCode(200) // Controlla che lo status code sia 200
+				.statusCode(HttpStatus.SC_OK) // Controlla che lo status code sia 200
 				.extract()
 				.response(); // Estrai la risposta
 
 		// Stampa la risposta per debug
-		System.out.println(getOneResponse.getBody().asString());
+		System.out.println(getOneResponse.getBody().asString() + "\n");
 	}
 
 	@Test
 	public void testGetUsers() {
-		User userToFound = getUserToFound();
-
 		Response getResponse = given()
 				.when()
 				.get("/users")
 				.then()
-				.statusCode(HttpStatus.OK.value()) // Verifica che il codice di stato sia 200 OK
+				.statusCode(HttpStatus.SC_OK) // Verifica che il codice di stato sia 200 OK
 				.body("$", is(not(empty()))) // Verifica che il corpo della risposta non sia vuoto
 				.body("size()", greaterThan(0)) // Verifica che ci siano elementi nella risposta
 				.extract().response();
@@ -67,14 +63,16 @@ public class UserApiTest {
 		// Verifica che la dimensione della lista sia quella prevista (in questo caso 10), con gli assert
 		assertEquals(10, users.size(), "La dimensione della lista dovrebbe essere 10");
 
-
-		System.out.println(getResponse.getBody().asString());
+		System.out.println(getResponse.getBody().asString() + "\n");
 	}
 
 	@Test
 	public void testCreateUser() {
 		// Crea un nuovo utente
-		User newUser = getNewUser();
+		Company company = new Company("new company", "new catch phrase", "new bs");
+		Geo geo = new Geo("23.3333", "-21,1908");
+		Address address = new Address("new street", "new suite", "new city", "new zipcode", geo);
+		User newUser = getNewUser(11, company, "new.com", "351962243", address, geo, "new@gmail.com", "newUsername","newName");
 
 		// Invia una richiesta POST per creare un nuovo utente
 		Response postResponse = given()
@@ -83,68 +81,109 @@ public class UserApiTest {
 				.when()
 				.post("/users")
 				.then()
-				.statusCode(201)
+				.statusCode(HttpStatus.SC_CREATED)
 				.body("id", notNullValue())
 				.extract().response();
 
 		// Verifica che l'ID del nuovo utente sia presente nella risposta
 		User newUserId = postResponse.as(User.class);
-		System.out.println("Created User ID: " + newUserId.getId());
+		System.out.println("Created User ID: " + newUserId.toString());
 	}
 
+	@Test
+	public void testExistingUser() {
+		User userToFind = userToFind();
 
+		Response getResponse = given()
+				.when()
+				.get("/users")
+				.then()
+				.statusCode(HttpStatus.SC_OK) // Verifica che il codice di stato sia 200 OK
+				.body("$", is(not(empty()))) // Verifica che il corpo della risposta non sia vuoto
+				.body("size()", greaterThan(0)) // Verifica che ci siano elementi nella risposta
+				.extract().response();
 
-	private static User getNewUser() {
-		User newUser = new User();
-		newUser.setName("New User");
-		newUser.setUsername("newuser");
-		newUser.setEmail("newuser@example.com");
+		var users = Arrays.stream(getResponse.as(User[].class)).toList();
+		// List<User> users = Arrays.asList(usersArray);
 
-		Address address = new Address();
-		address.setStreet("123 New Street");
-		address.setSuite("Suite 123");
-		address.setCity("New City");
-		address.setZipcode("12345");
+		// Verifica che la lista non sia vuota con gli assert
+		assertFalse(users.isEmpty(), "La lista degli utenti non dovrebbe essere vuota");
 
-		Geo geo = new Geo();
-		geo.setLat("-70.0000");
-		geo.setLng("-50.0000");
-		address.setGeo(geo);
+		// Verifica che la dimensione della lista sia quella prevista (in questo caso 10), con gli assert
+		assertEquals(10, users.size(), "La dimensione della lista dovrebbe essere 10");
 
-		newUser.setAddress(address);
-		newUser.setPhone("1-234-567-8900");
-		newUser.setWebsite("newuser.info");
+		boolean userFound = false;
 
-		Company company = new Company();
-		company.setName("New Company");
-		company.setCatchPhrase("New Company Catchphrase");
-		company.setBs("New Company Business");
-		newUser.setCompany(company);
-		return newUser;
+		for (User user : users) {
+			if (user.getId() == userToFind.getId()) {
+				verifyUserDetails(user, userToFind.getId(), userToFind.getName(), userToFind.getUsername(), userToFind.getEmail(), userToFind.getPhone(), userToFind.getWebsite());
+				verifyAddress(user.getAddressObject(), userToFind.getAddressObject());
+				verifyCompany(user.getCompanyObject(), userToFind.getCompanyObject());
+				userFound = true;
+				break;
+			}
+		}
+		System.out.println(userToFind.toString());
+
+		if(userFound)
+			System.out.println("\nL'utente specificato è stato trovato nella lista");
+
+		assertTrue(userFound, "\nL'utente specificato non è stato trovato nella lista");
 	}
 
-	private void verifyUserDetails(User user, int expectedId, String expectedName, String expectedUsername, String expectedEmail, String expectedPhone, String expectedWebsite) {
-		assertEquals(expectedId, user.getId(), "L'ID dell'utente non corrisponde");
-		assertEquals(expectedName, user.getName(), "Il nome dell'utente non corrisponde");
-		assertEquals(expectedUsername, user.getUsername(), "Il nome utente dell'utente non corrisponde");
-		assertEquals(expectedEmail, user.getEmail(), "L'email dell'utente non corrisponde");
-		assertEquals(expectedPhone, user.getPhone(), "Il numero di telefono dell' utente non corrisponde");
-		assertEquals(expectedWebsite, user.getWebsite(), "Il sito web dell' utente non corrisponde");
+	@Test
+	public void testNotExistingUser() {
+		User notExistingUser = notExistingUser();
+
+		Response getResponse = given()
+				.when()
+				.get("/users")
+				.then()
+				.statusCode(HttpStatus.SC_OK) // Verifica che il codice di stato sia 200 OK
+				.body("$", is(not(empty()))) // Verifica che il corpo della risposta non sia vuoto
+				.body("size()", greaterThan(0)) // Verifica che ci siano elementi nella risposta
+				.extract().response();
+
+		var users = Arrays.stream(getResponse.as(User[].class)).toList();
+		// List<User> users = Arrays.asList(usersArray);
+
+		// Verifica che la lista non sia vuota con gli assert
+		assertFalse(users.isEmpty(), "La lista degli utenti non dovrebbe essere vuota");
+
+		// Verifica che la dimensione della lista sia quella prevista (in questo caso 10), con gli assert
+		assertEquals(10, users.size(), "La dimensione della lista dovrebbe essere 10");
+
+		boolean userFound = false;
+
+		for (User user : users) {
+			if (user.getId() == notExistingUser.getId()) {
+				verifyUserDetailsNoId(user, notExistingUser.getName(), notExistingUser.getUsername(), notExistingUser.getEmail(), notExistingUser.getPhone(), notExistingUser.getWebsite());
+				verifyAddress(user.getAddressObject(), notExistingUser.getAddressObject());
+				verifyCompany(user.getCompanyObject(), notExistingUser.getCompanyObject());
+				userFound = true;
+				break;
+			}
+		}
+		System.out.println(notExistingUser.toString());
+
+		if(!userFound)
+			System.out.println("L'utente specificato non è stato trovato nella lista");
+
+		assertFalse(userFound, "L'utente specificato, che non dovrebbe esistere, è stato trovato nella lista");
 	}
 
-	private void verifyAddress(Address actualAddress, Address expectedAddress) {
-		assertEquals(expectedAddress.getStreet(), actualAddress.getStreet(), "La via dell'indirizzo non corrisponde");
-		assertEquals(expectedAddress.getSuite(), actualAddress.getSuite(), "La suite dell'indirizzo non corrisponde");
-		assertEquals(expectedAddress.getCity(), actualAddress.getCity(), "La città dell'indirizzo non corrisponde");
-		assertEquals(expectedAddress.getZipcode(), actualAddress.getZipcode(), "Il CAP dell'indirizzo non corrisponde");
-		assertEquals(expectedAddress.getGeo().getLat(), actualAddress.getGeo().getLat(), "La latitudine dell'indirizzo non corrisponde");
-		assertEquals(expectedAddress.getGeo().getLng(), actualAddress.getGeo().getLng(), "La longitudine dell'indirizzo non corrisponde");
+	@Test
+	public void getUsersNot404() {
+		Response getResponse = given()
+				.when()
+				.get("/users")
+				.then()
+				.statusCode(not(HttpStatus.SC_NOT_FOUND)) // Verifica che il codice di stato non sia 404 NOT FOUND
+				.body("$", is(not(empty()))) // Verifica che il corpo della risposta non sia vuoto
+				.body("size()", greaterThan(0)) // Verifica che ci siano elementi nella risposta
+				.extract().response();
+
+		System.out.println(getResponse.getBody().asString() + "\n");
 	}
 
-	private void verifyCompany(Company actualCompany, Company expectedCompany) {
-		assertEquals(expectedCompany.getName(), actualCompany.getName(), "Il nome dell'azienda non corrisponde");
-		assertEquals(expectedCompany.getCatchPhrase(), actualCompany.getCatchPhrase(), "Il motto dell'azienda non corrisponde");
-		assertEquals(expectedCompany.getBs(), actualCompany.getBs(), "Il business dell'azienda non corrisponde");
-	}
 }
-
