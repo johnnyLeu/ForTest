@@ -1,7 +1,7 @@
 package com.aesys.exerciceTest.model;
 
 public class User {
-    private float id;
+    private int id;
     private String name;
     private String username;
     private String email;
@@ -10,10 +10,22 @@ public class User {
     private String website;
     private Company CompanyObject;
 
+    public User() {}
 
-    // Getter Methods
+    public User(Company companyObject, String phone, String website, String email, Address addressObject, String username, String name, int id) {
+        CompanyObject = companyObject;
+        this.phone = phone;
+        this.website = website;
+        this.email = email;
+        AddressObject = addressObject;
+        this.username = username;
+        this.name = name;
+        this.id = id;
+    }
 
-    public float getId() {
+// Getter Methods
+
+    public int getId() {
         return id;
     }
 
@@ -47,7 +59,7 @@ public class User {
 
     // Setter Methods
 
-    public void setId( float id ) {
+    public void setId( int id ) {
         this.id = id;
     }
 

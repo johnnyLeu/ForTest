@@ -7,6 +7,15 @@ public class Address {
     private String zipcode;
     private Geo GeoObject;
 
+    public Address() {}
+
+    public Address(String street, String suite, String city, String zipcode, Geo geoObject) {
+        this.street = street;
+        this.suite = suite;
+        this.city = city;
+        this.zipcode = zipcode;
+        GeoObject = geoObject;
+    }
 
     // Getter Methods
 

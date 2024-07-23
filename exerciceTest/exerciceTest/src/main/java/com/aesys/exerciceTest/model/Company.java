@@ -5,8 +5,15 @@ public class Company {
     private String catchPhrase;
     private String bs;
 
+    public Company() {}
 
-    // Getter Methods
+    public Company(String name, String catchPhrase, String bs) {
+        this.name = name;
+        this.catchPhrase = catchPhrase;
+        this.bs = bs;
+    }
+
+// Getter Methods
 
     public String getName() {
         return name;

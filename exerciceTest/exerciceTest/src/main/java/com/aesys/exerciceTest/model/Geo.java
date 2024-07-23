@@ -4,8 +4,14 @@ public class Geo {
     private String lat;
     private String lng;
 
+    public Geo() {}
 
-    // Getter Methods
+    public Geo(String lat, String lng) {
+        this.lat = lat;
+        this.lng = lng;
+    }
+
+// Getter Methods
 
     public String getLat() {
         return lat;
