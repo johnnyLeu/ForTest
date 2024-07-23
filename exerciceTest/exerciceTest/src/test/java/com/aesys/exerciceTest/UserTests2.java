@@ -21,48 +21,34 @@ import static org.junit.Assert.assertTrue;
 
 public class UserTests2 {
 
+
+
     @BeforeAll
     public static void setup() {
         RestAssured.baseURI = "https://jsonplaceholder.typicode.com";
     }
 
-    /*
-    1. TEST CONTROLLO UTENTE ESISTENTE:
+    /*  1. TEST CONTROLLO UTENTE ESISTENTE:
     richiamare la get users
     controllare status code 200
     controllare che la size non sia 0
+    controllare che esista uno user specifico (Patricia Lebsack)
+    NB: lo user da controllare deve essere creato come oggetto User */
 
-    */
 
     @Test
     public void commonTest() {
-        Response getResponse = given()
-                .when()
-                .get("/users")
-                .then()
-                .assertThat()
-                .statusCode(200) //
-                .body("$", is(not(empty()))) // not empty
-                .body("size()", greaterThan(0)) // there are elements
-                .extract().response();
-
-        System.out.println(getResponse.getBody().asString());
-    }
-
-
-    /*
-    controllare che esista uno user specifico (Patricia Lebsack)
-    NB: lo user da controllare deve essere creato come oggetto User
-    */
-
-    @Test
-    public void checkOnParticularUser() {
-
         Response response = given()
                 .when()
                 .get("/users")
                 .then()
+                .assertThat()
+                .statusCode(200)
+                .body("$", is(not(empty())))
+                .body("size()", greaterThan(0)) // there are elements
                 .extract().response();
+
+        //System.out.println(response.getBody().asString());
 
         JsonPath jsonPath = response.jsonPath();
         List<User> allUsers = jsonPath.getList("", User.class);
@@ -70,22 +56,20 @@ public class UserTests2 {
         List<User> certainUser = allUsers.stream()
                 .filter(u -> u.getName().equals("Patricia Lebsack"))
                 .toList();
-
         assertNotNull(certainUser);
 
+        System.out.println(certainUser.get(0));
 
     }
 
 
 
-    /*
-    2. TEST CONTROLLO UTENTE NON ESISTENTE:
+    /* 2. TEST CONTROLLO UTENTE NON ESISTENTE:
     richiamare la get users
     controllare status code 200
     controllare che la size non sia 0
     controllare che non esista uno user specifico (Dwayne Johnson)
-    NB: lo user da controllare deve essere creato come oggetto User
-    */
+    NB: lo user da controllare deve essere creato come oggetto User  */
 
 
     @Test
@@ -95,11 +79,10 @@ public class UserTests2 {
                 .get("/users")
                 .then()
                 .assertThat()
-                .statusCode(200) //
-                .body("$", is(not(empty()))) // not empty
-                .body("size()", greaterThan(0)) // there are elements
+                .statusCode(200)
+                .body("$", is(not(empty())))
+                .body("size()", greaterThan(0))
                 .extract().response();
-
 
         JsonPath jsonPath = response.jsonPath();
 

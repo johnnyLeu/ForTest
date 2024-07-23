@@ -51,24 +51,20 @@ public class UserTests1 {
         RestAssured.baseURI = "https://jsonplaceholder.typicode.com";
     }
 
+
+
    /* @Test
     public void takeAll() {
-        given()
-                .when()
-                .get("/users")
-                .then()
-                .log().all();
+        given().when().get("/users")
+                .then().log().all();
     }*/
 
 
 
-    /*
-    TEST 1 - POSTMAN
+    /* TEST 1
     Recuperare le informazioni dall'URL: https://jsonplaceholder.typicode.com/users
     Controllare che la risposta vada in success
-    Controllare che il body della response non sia vuoto
-    */
-
+    Controllare che il body della response non sia vuoto  */
     @Test
     public void testResponseAndStatusCode() {
         Response response = given()
@@ -83,13 +79,11 @@ public class UserTests1 {
     }
 
 
-    /*
-    TEST 2 - POSTMAN
+    /* TEST 2
     Recuperare le informazioni dall'URL: https://jsonplaceholder.typicode.com/users
     Prendere un item dalla response e modificarlo, creandone uno nuovo
     Controllare che la risposta sia "Created" con relativo codice
-    Controllare che nella response venga mostrato l'ID dell'elemento appena creato
-     */
+    Controllare che nella response venga mostrato l'ID dell'elemento appena creato  */
 
     @Test
     public void createUser() {
@@ -103,9 +97,7 @@ public class UserTests1 {
                 .assertThat()
                 .statusCode(201)
                 .extract().response();
-
         System.out.println("Created User: " + postResponse.getBody().asString());
-
     }
 
 
