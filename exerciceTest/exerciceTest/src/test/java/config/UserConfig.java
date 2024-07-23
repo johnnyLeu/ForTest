@@ -7,6 +7,9 @@ import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import org.junit.BeforeClass;
 
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.equalTo;
+
 public class UserConfig {
     @BeforeClass
     public static void setup(){
@@ -20,7 +23,7 @@ public class UserConfig {
                 .build();
 
         RestAssured.responseSpecification = new ResponseSpecBuilder()
-                .expectStatusCode(200)
+                .expectStatusCode(anyOf(equalTo(200), equalTo(201)))
                 .build();
 
     }
