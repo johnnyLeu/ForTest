@@ -9,7 +9,10 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -52,7 +55,27 @@ public class UserApiTest {
 				.extract().response();
 
 		System.out.println(getResponse.getBody().asString());
-		getResponse.as(User.class).getName();
+		List<String> productNames = getResponse.jsonPath().getList("name");
+
+		try {
+			assertThat(productNames, hasItem("Mrs. Dennis Schulist"));
+			System.out.println("Il nome 'Mrs. Dennis Schulist' è presente nella lista dei prodotti.");
+		} catch (AssertionError e) {
+			System.err.println("Il nome 'Mrs. Dennis Schulist' NON è presente nella lista dei prodotti.");
+			throw e;
+		}
+
+		System.out.println("Fine test: testCheckUser");
+
+		// Verifica che tutti gli utenti abbiano un'età maggiore di 18 anni
+//		List<Integer> ages = getResponse.jsonPath().getList("age");
+//		System.out.println("Verifica delle età degli utenti");
+//		for (Integer age : ages) {
+//			System.out.println("Verifica che l'età " + age + " sia maggiore di 18");
+//			assertThat(age, greaterThan(18));
+//		}
+
+
 	}
 
 	@Test
