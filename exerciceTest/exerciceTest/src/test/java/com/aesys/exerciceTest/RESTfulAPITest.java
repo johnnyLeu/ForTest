@@ -61,7 +61,7 @@ public class RESTfulAPITest {
                 .assertThat()
                 .statusCode(200)
                 .body("$", is(not(empty())))
-                .body("size()", equalTo(3))
+                .body("size()", equalTo(3)) //assertion: objects are tot 3
                 .extract().response();
 
         List<Object> objects = response.jsonPath().getList("", Object.class);
@@ -83,11 +83,9 @@ public class RESTfulAPITest {
                 .log().all()
                 .assertThat()
                 .statusCode(200)
-                .body("$", is(not(empty())))
-                .body("id", is("7"))
+                .body("$", is(not(empty())))  //assertion
+                .body("id", is("7")) //assertion: id is 7
                 .extract().response();
-
-
     }
 
 
