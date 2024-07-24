@@ -1,6 +1,6 @@
 package com.aesys.exerciceTest;
 
-import com.aesys.exerciceTest.dto.User;
+import com.aesys.exerciceTest.dtoUser.User;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;

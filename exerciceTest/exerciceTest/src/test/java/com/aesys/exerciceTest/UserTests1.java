@@ -1,11 +1,12 @@
 package com.aesys.exerciceTest;
 
 
-import com.aesys.exerciceTest.dto.Address;
+import com.aesys.exerciceTest.dtoUser.Address;
 
-import com.aesys.exerciceTest.dto.Company;
-import com.aesys.exerciceTest.dto.GEO;
-import com.aesys.exerciceTest.dto.User;
+import com.aesys.exerciceTest.dtoUser.Company;
+import com.aesys.exerciceTest.dtoUser.GEO;
+import com.aesys.exerciceTest.dtoUser.User;
+
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeAll;
