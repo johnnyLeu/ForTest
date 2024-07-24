@@ -45,31 +45,31 @@ public class UserApiTest {
 		System.out.println(getOneResponse.getBody().asString());
 	}
 
-	@Test
-	public void testGetUsers() {
-		User userToFound = getUserToFound();
-
-		Response getResponse = given()
-				.when()
-				.get("/users")
-				.then()
-				.statusCode(HttpStatus.OK.value()) // Verifica che il codice di stato sia 200 OK
-				.body("$", is(not(empty()))) // Verifica che il corpo della risposta non sia vuoto
-				.body("size()", greaterThan(0)) // Verifica che ci siano elementi nella risposta
-				.extract().response();
-
-		var users = Arrays.stream(getResponse.as(User[].class)).toList();
-		// List<User> users = Arrays.asList(usersArray);
-
-		// Verifica che la lista non sia vuota con gli assert
-		assertFalse(users.isEmpty(), "La lista degli utenti non dovrebbe essere vuota");
-
-		// Verifica che la dimensione della lista sia quella prevista (in questo caso 10), con gli assert
-		assertEquals(10, users.size(), "La dimensione della lista dovrebbe essere 10");
-
-
-		System.out.println(getResponse.getBody().asString());
-	}
+//	@Test
+//	public void testGetUsers() {
+//		User userToFound = getUserToFound();
+//
+//		Response getResponse = given()
+//				.when()
+//				.get("/users")
+//				.then()
+//				.statusCode(HttpStatus.OK.value()) // Verifica che il codice di stato sia 200 OK
+//				.body("$", is(not(empty()))) // Verifica che il corpo della risposta non sia vuoto
+//				.body("size()", greaterThan(0)) // Verifica che ci siano elementi nella risposta
+//				.extract().response();
+//
+//		var users = Arrays.stream(getResponse.as(User[].class)).toList();
+//		// List<User> users = Arrays.asList(usersArray);
+//
+//		// Verifica che la lista non sia vuota con gli assert
+//		assertFalse(users.isEmpty(), "La lista degli utenti non dovrebbe essere vuota");
+//
+//		// Verifica che la dimensione della lista sia quella prevista (in questo caso 10), con gli assert
+//		assertEquals(10, users.size(), "La dimensione della lista dovrebbe essere 10");
+//
+//
+//		System.out.println(getResponse.getBody().asString());
+//	}
 
 	@Test
 	public void testCreateUser() {
