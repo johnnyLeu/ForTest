@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static com.aesys.exerciceTest.utilities.ObjectApiTestUtil.newObject;
-import static com.aesys.exerciceTest.utilities.ObjectApiTestUtil.updatedObject;
+import static com.aesys.exerciceTest.utilities.ObjectApiTestUtil.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -59,12 +58,12 @@ public class ObjectApiTest {
 
     @Test
     public void testObjectById() {
-        String userId = "7";
+        String userId = "ff80818190db30490190e53aa3cd11a0";
 
         Response response = given()
                 .pathParam("id", userId)
                 .when()
-                .get("/object/{id}")
+                .get("/objects/{id}")
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .extract()
@@ -100,11 +99,9 @@ public class ObjectApiTest {
 
     @Test
     public void testUpdateObject() {
-        // Prepara i dati dell'oggetto aggiornato
         Oggetto updatedObject = updatedObject();
         String userId = "ff80818190db30490190e52f5b43118e";
 
-        // Esegui la richiesta PUT
         Response response = RestAssured
                 .given()
                 .header("Content-Type", "application/json")
@@ -113,14 +110,67 @@ public class ObjectApiTest {
                 .when()
                 .put("/objects/{id}")
                 .then()
-                .statusCode(HttpStatus.SC_OK)  // Verifica che la risposta abbia codice di stato 200 OK
-                .body("name", equalTo("newName"))  // Verifica che il nome sia stato aggiornato
-                .body("data.color", equalTo("blue"))  // Verifica che i dati siano stati aggiornati
-                .body("data.capacity", equalTo("256 GB"))  // Verifica che i dati siano stati aggiornati
-                .body("data.price", equalTo(99.5F))  // Verifica che i dati siano stati aggiornati
-                .body("data.year", equalTo(2029))  // Verifica che i dati siano stati aggiornati
+                .statusCode(HttpStatus.SC_OK)
                 .extract()
                 .response();
 
+        String name = response.jsonPath().getString("name");
+        String color = response.jsonPath().getString("data.color");
+        String capacity = response.jsonPath().getString("data.capacity");
+        Float price = response.jsonPath().getFloat("data.price");
+        Integer year = response.jsonPath().getInt("data.year");
+
+        assertEquals("newName", name);
+        assertEquals("blue", color);
+        assertEquals("256 GB", capacity);
+        assertEquals(99.5F, price);
+        assertEquals(2029, year);
+
+        System.out.println(response.getBody().prettyPrint() + "\n");
+    }
+
+    @Test
+    public void testPatchObject() {
+        Oggetto patchedObject = partiallyUpdatedObject();
+        String userId = "ff80818190db30490190e52f5b43118e";
+
+        // Esegui la richiesta PUT
+        Response response = RestAssured
+                .given()
+                .header("Content-Type", "application/json")
+                .pathParam("id", userId)
+                .body(patchedObject)
+                .when()
+                .patch("/objects/{id}")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response();
+
+        Integer year = response.jsonPath().getInt("data.year");
+
+        assertEquals(2023, year);
+
+        System.out.println(response.getBody().prettyPrint() + "\n");
+    }
+
+    @Test
+    public void testDeleteObject() {
+        String userId = "ff80818190db30490190e52f5b43118e";
+
+        Response response = given()
+                .pathParam("id", userId)
+                .when()
+                .delete("/objects/{id}")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response();
+
+        Integer year = response.jsonPath().getInt("data.year");
+
+        assertEquals(2023, year);
+
+        System.out.println(response.getBody().prettyPrint() + "\n");
     }
 }

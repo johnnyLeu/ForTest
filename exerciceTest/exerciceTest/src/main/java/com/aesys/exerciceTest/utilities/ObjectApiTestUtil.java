@@ -29,5 +29,12 @@ public class ObjectApiTestUtil {
         return new Oggetto("newName", data);
     }
 
+    public static Oggetto partiallyUpdatedObject(){
+        Data data = new Data.Builder()
+                .setYear(2023)
+                .build();
+
+        return new Oggetto("newName", data);
+    }
 
 }
