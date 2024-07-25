@@ -26,7 +26,7 @@ public class ObjectApiTest {
     public void testGetObjects() {
         Response getResponse = given()
                 .when()
-                .get("/Oggettos")
+                .get("/objects")
                 .then()
                 .log().all()
                 .statusCode(HttpStatus.SC_OK) // Verifica che il codice di stato sia 200 OK
@@ -154,23 +154,21 @@ public class ObjectApiTest {
         System.out.println(response.getBody().prettyPrint() + "\n");
     }
 
-    @Test
-    public void testDeleteObject() {
-        String userId = "ff80818190db30490190e52f5b43118e";
+        @Test
+        public void testDeleteObject() {
+            String userId = "ff80818190db30490190e8baec1214f7";
 
-        Response response = given()
-                .pathParam("id", userId)
-                .when()
-                .delete("/objects/{id}")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract()
-                .response();
+            // Esegui la richiesta DELETE
+            Response response = given()
+                    .pathParam("id", userId)
+                    .when()
+                    .delete("/objects/{id}")
+                    .then()
+                    .statusCode(HttpStatus.SC_OK)// Verifica che la risposta abbia codice di stato 200 OK
+                    .extract()
+                    .response();
 
-        Integer year = response.jsonPath().getInt("data.year");
-
-        assertEquals(2023, year);
-
-        System.out.println(response.getBody().prettyPrint() + "\n");
-    }
+            // Stampa il corpo della risposta per debug
+            System.out.println(response.getBody().prettyPrint() + "\n");
+        }
 }

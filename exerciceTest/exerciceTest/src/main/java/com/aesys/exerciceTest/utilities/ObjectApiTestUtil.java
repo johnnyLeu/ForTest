@@ -5,7 +5,7 @@ import com.aesys.exerciceTest.model.Oggetto;
 
 public class ObjectApiTestUtil {
 
-    public static Oggetto newObject(){
+    public static Oggetto newObject() {
         Data data = new Data.Builder()
                 .setColor("Red")
                 .setCapacity("256 GB")
@@ -18,7 +18,7 @@ public class ObjectApiTestUtil {
         return new Oggetto("newName", data);
     }
 
-    public static Oggetto updatedObject(){
+    public static Oggetto updatedObject() {
         Data data = new Data.Builder()
                 .setColor("blue")
                 .setCapacity("256 GB")
@@ -29,7 +29,7 @@ public class ObjectApiTestUtil {
         return new Oggetto("newName", data);
     }
 
-    public static Oggetto partiallyUpdatedObject(){
+    public static Oggetto partiallyUpdatedObject() {
         Data data = new Data.Builder()
                 .setYear(2023)
                 .build();
