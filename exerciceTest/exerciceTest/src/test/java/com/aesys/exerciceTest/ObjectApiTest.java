@@ -156,7 +156,19 @@ public class ObjectApiTest {
 
         @Test
         public void testDeleteObject() {
-            String userId = "ff80818190db30490190e8baec1214f7";
+            Oggetto obj = newObject();
+
+            Response createResponse = given()
+                    .header("Content-type", "application/json")
+                    .body(obj)
+                    .when()
+                    .post("/objects")
+                    .then()
+                    .statusCode(HttpStatus.SC_OK)
+                    .extract()
+                    .response();
+
+            String userId = createResponse.as(Oggetto.class).getId();
 
             // Esegui la richiesta DELETE
             Response response = given()
@@ -169,6 +181,6 @@ public class ObjectApiTest {
                     .response();
 
             // Stampa il corpo della risposta per debug
-            System.out.println(response.getBody().prettyPrint() + "\n");
+            System.out.println(response.getBody().asString() + "\n");
         }
 }
