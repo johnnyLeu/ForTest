@@ -3,11 +3,9 @@ package com.aesys.exerciceTest;
 import com.aesys.exerciceTest.dtoObject.Data;
 import com.aesys.exerciceTest.dtoObject.Object;
 import com.aesys.exerciceTest.dtoUser.User;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +27,6 @@ public class RESTfulAPITest {
     public static void setup() {
         RestAssured.baseURI = "https://api.restful-api.dev";
     }
-
 
 
     @Test
@@ -69,7 +66,7 @@ public class RESTfulAPITest {
         assertThat(objects, hasItems(
                 hasProperty("id", is(3)),
                 hasProperty("id", is(5)),
-                hasProperty("id", is(10)) ));
+                hasProperty("id", is(10))));
     }
 
 
@@ -89,12 +86,18 @@ public class RESTfulAPITest {
     }
 
 
-    Data data = new Data(2019, 1849.99, "Intel Core i9", "1 TB", "", "", "","", "");
-    Object obj = new Object(0,"Apple MacBook Pro 16", data);
-
-
     @Test
-    public void createObject() {
+    public void objectPostPutPatchDelete() {
+
+
+        Data data = new Data(2019, 1849.99, "Intel Core i9", "1 TB", "", "", "", "", "");
+        Object obj = new Object(0, "Apple MacBook Pro 16", data);
+
+
+
+        System.out.println();
+        System.out.println("==================POST==================");
+        System.out.println();
 
         Response postResponse = given()
                 .header("Content-Type", "application/json")
@@ -102,36 +105,69 @@ public class RESTfulAPITest {
                 .when()
                 .post("/objects")
                 .then()
+                .log().all()
                 .assertThat()
                 .statusCode(200)
                 .extract().response();
-        System.out.println("Created object: " + postResponse.getBody().asString());
 
-    }
-
-
-
-    Data dataNew = new Data(2019, 1849.99, "Intel Core i9", "1 TB", "silver", "", "","", "");
-    Object objNew = new Object(0,"Apple MacBook Pro 16", dataNew);
+        JsonPath jsonPath = new JsonPath(postResponse.body().asString());
+        String id_param = jsonPath.getString("id");
 
 
-    @Test
-    public void updateObject() {
+
+        System.out.println();
+        System.out.println("==================PUT(color=silver)==================");
+        System.out.println();
+
+        data.setColor("silver");
+        obj.setData(data);
 
         Response putResponse = given()
                 .header("Content-Type", "application/json")
-                .body(objNew)
+                .body(obj)
                 .when()
-                .put("/objects/ff80818190db30490190e4f501ce10f1")
+                .put("/objects/{id}", id_param)
                 .then()
                 .log().all()
                 .assertThat()
                 .statusCode(200)
                 .extract().response();
-        System.out.println("Updated object: " + putResponse.getBody().asString());
+
+
+        System.out.println();
+        System.out.println("==================PATCH(name)==================");
+        System.out.println();
+
+
+        obj.setName("Apple MacBook Pro 16 (Updated Name)");
+        String jsonString = "{\"name\": \"" + obj.getName() + "\"}";
+
+
+        Response patchResponse = given()
+                .header("Content-Type", "application/json")
+                .body(jsonString)
+                .when()
+                .patch("/objects/{id}", id_param)
+                .then()
+                .log().all()
+                .assertThat()
+                .statusCode(200)
+                .extract().response();
+
+
+        System.out.println();
+        System.out.println("==================DELETE==================");
+        System.out.println();
+
+        given()
+                .when()
+                .delete("/objects/{id}", id_param)
+                .then()
+                .log().all()
+                .assertThat()
+                .statusCode(200);
 
     }
-
 
 
 }
